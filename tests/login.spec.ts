@@ -21,6 +21,24 @@ await page.getByPlaceholder("Username").fill("admin")
 await page.getByPlaceholder("Password").fill("Admin123")
 //Then clicks on LoginButton
 await page.getByRole('button',{name:"Login"}).click();
-//Then verify that the Dashboard is not visible and so login is unsuccesful
-await expect(page.getByRole('heading',{name:"Dashboard"})).toBeHidden;
+//Then verify the error message on the Login screen
+await expect(page.getByText("Invalid credentials")).toBeVisible();
 });
+
+
+test('invalid login with blank username',async({page})=>{
+//Given user navigates to the application url   
+await page.goto("https://opensource-demo.orangehrmlive.com/")
+//When the user keep Username as blank
+await page.getByPlaceholder("Username").fill(" ")
+//And the user enters the correct Password
+await page.getByPlaceholder("Password").fill("admin123")
+//Then clicks on LoginButton
+await page.getByRole('button',{name:"Login"}).click();
+//Then verify the error message on the Login screen
+await expect(page.locator('//input[contains(@class,"oxd-input--error") and @placeholder="Username"]/parent::div/following-sibling::span[text()="Required"]')).toBeVisible();
+//And verifies that Username field enters an error stage
+await expect(page.getByPlaceholder('Username'))
+    .toHaveAttribute('class', /oxd-input--error/);
+});
+
