@@ -46,17 +46,33 @@ await expect(page.getByPlaceholder('Username'))
 test('invalid login with blank password',async({page})=>{
 //Given user navigates to the application url   
 await page.goto("https://opensource-demo.orangehrmlive.com/")
-//When the user keep Username as blank
+//When the user enters the Username
 await page.getByPlaceholder("Username").fill("Admin")
-//And the user enters the correct Password
+//And the user keeps the password blank
 await page.getByPlaceholder("Password").fill("")
-//Then clicks on LoginButton
+//Then clicks on Login Button
 await page.getByRole('button',{name:"Login"}).click();
 //Then verify the error message on the Login screen
 await expect(page.locator('//input[contains(@class,"oxd-input--error") and @placeholder="Password"]/parent::div/following-sibling::span[text()="Required"]')).toBeVisible();
 //And verifies that Username field enters an error stage
 await expect(page.getByPlaceholder('Password'))
     .toHaveAttribute('class', /oxd-input--error/);
-//And verify that the user stays in the login page whose heading is ogin
+//And verify that the user stays in the login page whose heading is Login
 await expect(page.getByRole('heading',{name:"Login"})).toBeVisible();
 });
+
+test('',async({page})=>{
+await page.goto("https://opensource-demo.orangehrmlive.com/")
+//When the user keeps the Username blank
+await page.getByPlaceholder("Username").fill("")
+//And the user also keeps the password blank
+await page.getByPlaceholder("Password").fill("")
+//Then clicks on Login Button
+await page.getByRole('button',{name:"Login"}).click(); 
+//Then verify two "Required" validation messages should be displayed, one for Username and one for Password
+const numberOfRequired=await page.locator('//input[contains(@class,"oxd-input--error") ]/parent::div/following-sibling::span[text()="Required"]').count();
+ expect(numberOfRequired).toBe(2);
+//And alsoverify that the user stays in the login page whose heading is Login
+await expect(page.getByRole('heading',{name:"Login"})).toBeVisible();
+}); 
+
