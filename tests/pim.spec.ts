@@ -39,5 +39,16 @@ await page.getByRole('listbox')
     .click();
 //And then the user clicks on the Search button
 await page.getByRole('button',{name:"Search"}).click();
+//Then The user verifies that the record is returned
+await expect(
+  page.getByText('(1) Record Found', { exact: true })
+).toBeVisible();
+//And then verifies that the record returned is the name that was selected
+const employeeRow= page.locator('.oxd-table-body .oxd-table-row')
+.filter({hasText:'Charles'})
+.filter({hasText:'Carter'});
+await expect(employeeRow).toHaveCount(1);
+await expect(employeeRow.getByText('Charles', { exact: true })).toBeVisible();
+await expect(employeeRow.getByText('Carter', { exact: true })).toBeVisible();
 
 })
