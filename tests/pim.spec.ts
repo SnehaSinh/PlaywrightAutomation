@@ -1,15 +1,19 @@
 import { test, expect } from '@playwright/test';
 import { PIMPage } from '../pages/PIMPage';
 import { LoginPage } from '../pages/LoginPage';
+
+test.beforeEach(async ({ page }) => {
+    const loginpage = new LoginPage(page);
+
+    await loginpage.navigateToLoginPage();
+    await loginpage.loginToApplication("Admin", "admin123");
+});
+
 test('navigate to pim',async({page})=>{
   const pimpage=new PIMPage(page);
-  const loginpage=new LoginPage(page);
 
- //Given user navigates to the application url   
-await loginpage.navigateToLoginPage();
-//Then successfully logs in the application
-await loginpage.loginToApplication("Admin","admin123")
-//Then verify that the Dashboard is visible and login is successful
+
+//Given the user is successfully logged in verify that dashboard is visible
 await expect(page.getByRole('heading',{name:"Dashboard"})).toBeVisible();
 //When the user clicks "PIM" from the left navigation menu
 await pimpage.navigateToPIM();
@@ -20,13 +24,9 @@ await expect(page.getByRole('heading',{name:"Employee Information"})).toBeVisibl
 
 });
 
+
 test('search employee by name',async({page})=>{
   const pimpage=new PIMPage(page);
-  const loginpage=new LoginPage(page);
- //Given user navigates to the application url   
-await loginpage.navigateToLoginPage();
-//Then successfully logs in the application
-await loginpage.loginToApplication("Admin","admin123")
 //When the user clicks on "PIM" from the left navigation menu
 await pimpage.navigateToPIM();
 //And enters the name in the Employee Name field
@@ -46,3 +46,4 @@ await expect(employeeRow).toHaveCount(1);
 await expect(employeeRow.getByText("Charles", { exact: true })).toBeVisible();
 await expect(employeeRow.getByText("Carter", { exact: true })).toBeVisible();
 })
+  
