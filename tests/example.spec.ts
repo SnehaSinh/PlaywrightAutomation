@@ -15,4 +15,20 @@ test('get started link', async ({ page }) => {
 
   // Expects page to have a heading with the name of Installation.
   await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-});
+
+  test("has title",async({page})=>{
+   await page.goto("https://playwright.dev/")
+   await expect(page).toHaveTitle(/Playwright/)
+  })
+  test("get started link",async({page}) =>{
+    await page.getByRole("link",{name:'Get Started'}).click();
+
+  })
+  test('practice locators',async({page})=>{
+    await page.goto("https://playwright.dev/");
+    await expect(page.getByRole('heading',{name : 'Playwright enables reliable web automation for testing ,scripting and AI agents'})
+  ).toBeVisible;
+}); 
+  
+
+})

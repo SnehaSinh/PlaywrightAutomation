@@ -2,6 +2,8 @@ import { test } from '../fixtures/pageFixtures';
 import { expect } from '@playwright/test';
 import { PIMPage } from '../pages/PIMPage';
 import { LoginPage } from '../pages/LoginPage';
+import { generateEmployeeName, generateRandomLastName } from '../helpers/employeeDataHelper'
+import { generateUpdatedEmployeeData } from '../helpers/employeeDataHelper';
 
 test.beforeEach(async ({ page }) => {
   const loginpage = new LoginPage(page);
@@ -23,27 +25,6 @@ test('navigate to pim', async ({ page, pimpage }) => {
 });
 
 
-test('search employee by name', async ({ page, pimpage }) => {
-  //Given the user is successfully logged in and clicks on "PIM" from the left navigation menu
-  await pimpage.navigateToPIM();
-  //And enters the name in the Employee Name field
-  await pimpage.searchEmployeeByName("Charles Carter")
-  //Then selects the name from the dropdown list
-  await pimpage.selectNameFromDropdown("Charles Carter");
-  //And then the user clicks on the Search button
-  await pimpage.clickSearch();
-  //Then The user verifies that the record is returned
-  await expect(
-    page.getByText('(1) Record Found', { exact: true })
-  ).toBeVisible();
-  //And then verifies that the record returned is the name that was selected
-  const employeeRow = pimpage.getEmployeeRow("Charles", "Carter");
-
-  await expect(employeeRow).toHaveCount(1);
-  await expect(employeeRow.getByText("Charles", { exact: true })).toBeVisible();
-  await expect(employeeRow.getByText("Carter", { exact: true })).toBeVisible();
-})
-
 test('add employee in pim', async ({ page, pimpage }) => {
   //Given the user is successfully logged in and navigates to pim page
   await pimpage.navigateToPIM();
@@ -54,8 +35,7 @@ test('add employee in pim', async ({ page, pimpage }) => {
   //Then verifies that the title on the page is Add Employee
   await expect(page.getByRole("heading", { name: "Add Employee", exact: true })).toBeVisible();
   //And then enter employeeDetails
-  const firstName = `Test${Date.now()}`;
-  const lastName = 'Automation';
+  const { firstName, lastName } = generateEmployeeName();
   await pimpage.enterEmployeeDetails(firstName, lastName);
   //Then save the details
   await pimpage.clickSave();
@@ -71,17 +51,14 @@ test('search newly created employee', async ({ page, pimpage }) => {
   //Then the user clicks on Add button to Add Employee
   await pimpage.navigateToAddEmployee();
   //Then the user creates employee
-  const firstName = `Test${Date.now()}`;
-  const lastName = 'Automation';
+  const { firstName, lastName } = generateEmployeeName();
   await pimpage.enterEmployeeDetails(firstName, lastName);
   //Then the user saves the details
   await pimpage.clickSave();
   //And then verify that the application navigates to Employee Personal Details page
-   await expect(page.getByRole("heading", { name: "Personal Details" })).toBeVisible();
-   console.log("Employee saved:", firstName, lastName);
-  console.log("Employee details URL:", page.url());
+  await expect(page.getByRole("heading", { name: "Personal Details" })).toBeVisible();
   //Then navigate to PIM page to do search operation
-   await pimpage.navigateToPIM();
+  await pimpage.navigateToPIM();
   //And the user searches for the newly created employee
   await pimpage.searchEmployeeByName(`${firstName}`)
   //Then selects the name from the dropdown list
@@ -100,3 +77,66 @@ test('search newly created employee', async ({ page, pimpage }) => {
   await expect(employeeRow.getByText(`${lastName}`, { exact: true })).toBeVisible();
 })
 
+
+test('update newly created employee', async ({ page, pimpage }) => {
+
+  // Given the user is logged in and navigates to PIM
+  await pimpage.navigateToPIM();
+
+  // When the user clicks Add Employee
+  await pimpage.navigateToAddEmployee();
+
+  // And creates an employee with dynamic data
+  const { firstName, lastName } = generateEmployeeName();
+
+  await pimpage.enterEmployeeDetails(firstName, lastName);
+  await pimpage.clickSave();
+
+  // Then verify the Personal Details page is displayed
+  await expect(
+    page.getByRole('heading', { name: 'Personal Details' })
+  ).toBeVisible();
+  // Wait until the original employee data is loaded
+  await expect(pimpage.lastNameInput)
+    .toHaveValue(lastName);
+  // When the user updates the employee details
+  const updatedData = generateUpdatedEmployeeData();
+  await pimpage.updateEmployeePersonalDetails(updatedData);
+
+  // Then verify the new values are entered correctly
+  await expect(pimpage.lastNameInput)
+    .toHaveValue(updatedData.lastName);
+
+  await expect(pimpage.licenseNumberInput)
+    .toHaveValue(updatedData.licenseNumber);
+
+  await expect(pimpage.licenseExpiryDateInput)
+    .toHaveValue(updatedData.licenseExpiryDate);
+
+  // When the user saves the updated details
+  await pimpage.saveUpdatedPersonalDetails();
+
+  // Then verify the update was successful
+  await expect(
+    page.getByText('Successfully Updated')
+  ).toBeVisible();
+
+  // Reload the employee page
+  await page.reload();
+
+  // Then verify the updated last name was saved
+  await expect(pimpage.lastNameInput)
+    .toHaveValue(updatedData.lastName);
+
+  // And verify the updated license number was saved
+  await expect(pimpage.licenseNumberInput)
+    .toHaveValue(updatedData.licenseNumber);
+
+  // And verify the updated license expiry date was saved
+  await expect(pimpage.licenseExpiryDateInput)
+    .toHaveValue(updatedData.licenseExpiryDate);
+console.log(updatedData.licenseExpiryDate)
+
+
+
+});

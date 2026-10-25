@@ -1,8 +1,28 @@
 import { Page } from '@playwright/test';
+import type { EmployeeData } from '../types/EmployeeData';
 export class PIMPage {
 
     constructor(private page: Page) {
 
+    }
+    get personalDetailsHeading() {
+        return this.page.getByRole('heading', { name: 'Personal Details' });
+    }
+
+    get lastNameInput() {
+        return this.page.getByPlaceholder('Last Name');
+    }
+    get licenseExpiryDateInput() {
+        return this.page.locator('//label[normalize-space()="License Expiry Date"]/../../descendant::input')
+    }
+    get licenseNumberInput() {
+        return this.page.locator(
+            `//label[normalize-space()="Driver's License Number"]/../../descendant::input`
+        );
+    }
+
+    get updateSuccessMessage() {
+        return this.page.getByText('Successfully Updated');
     }
     async navigateToPIM() {
         await this.page.getByRole('link', { name: 'PIM' }).click();
@@ -27,18 +47,36 @@ export class PIMPage {
             .filter({ hasText: lastName });
     }
     async navigateToAddEmployee() {
-        console.log(
-    "Add buttons found:",
-    await this.page.getByRole('button', { name: 'Add'}).count()
-);
+
         await this.page.getByRole("button", { name: "Add" }).click();
     }
     async enterEmployeeDetails(firstName: string, lastName: string) {
         await this.page.getByPlaceholder("First Name").fill(firstName);
         await this.page.getByPlaceholder("Last Name").fill(lastName);
-        
+        6
     }
     async clickSave() {
         await this.page.getByRole("button", { name: "Save" }).click();
+    }
+    async updateEmployeeLastName(lastname: string) {
+
+        await this.page.getByPlaceholder("Last Name").fill(lastname);
+
+    }
+
+    async updateEmployeePersonalDetails(employeeData: EmployeeData) {
+        // Update employee's last name
+        await this.lastNameInput.fill(employeeData.lastName);
+        await this.lastNameInput.press('Tab');
+        // Update employee's license number
+        await this.licenseNumberInput.fill(employeeData.licenseNumber);
+         // Update employee's license expiry date
+         await this.licenseExpiryDateInput.fill(employeeData.licenseExpiryDate)
+
+    }
+
+    async saveUpdatedPersonalDetails() {
+        await this.page.getByRole('button', { name: 'Save' }).first().click();
+
     }
 }
