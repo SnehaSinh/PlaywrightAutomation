@@ -7,3 +7,8 @@ export type EmployeeData = {
     dateOfBirth: string;
     gender: string;
 };
+export type EmployeeAdditionalData = {
+    nationality: string;
+    gender: string;
+    dateOfBirth: string;
+};

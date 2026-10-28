@@ -1,8 +1,7 @@
 import { test } from '../fixtures/pageFixtures';
 import { expect } from '@playwright/test';
-import { PIMPage } from '../pages/PIMPage';
 import { LoginPage } from '../pages/LoginPage';
-import { generateEmployeeName, generateRandomLastName } from '../helpers/employeeDataHelper'
+import { generateEmployeeAdditionalData, generateEmployeeName, generateRandomLastName } from '../helpers/employeeDataHelper'
 import { generateUpdatedEmployeeData } from '../helpers/employeeDataHelper';
 
 test.beforeEach(async ({ page }) => {
@@ -42,7 +41,7 @@ test('add employee in pim', async ({ page, pimpage }) => {
   //And verify the save is successful
   await expect(page.getByText("Successfully Saved")).toBeVisible();
   //Also verify that the application navigates to Employee Personal Details page
-  await expect(page.getByRole("heading", { name: "Personal Details" }))
+  await expect(page.getByRole("heading", { name: "Personal Details" })).toBeVisible();
 })
 
 test('search newly created employee', async ({ page, pimpage }) => {
@@ -78,7 +77,7 @@ test('search newly created employee', async ({ page, pimpage }) => {
 })
 
 
-test('update newly created employee', async ({ page, pimpage }) => {
+test('update newly created employee last name ,license number, license expiry date and marriage status ', async ({ page, pimpage }) => {
 
   // Given the user is logged in and navigates to PIM
   await pimpage.navigateToPIM();
@@ -93,14 +92,12 @@ test('update newly created employee', async ({ page, pimpage }) => {
   await pimpage.clickSave();
 
   // Then verify the Personal Details page is displayed
-  await expect(
-    page.getByRole('heading', { name: 'Personal Details' })
-  ).toBeVisible();
+  await expect(pimpage.personalDetailsHeading).toBeVisible({ timeout: 15000 });
   // Wait until the original employee data is loaded
   await expect(pimpage.lastNameInput)
-    .toHaveValue(lastName);
+    .toHaveValue(lastName, { timeout: 150000 });
   // When the user updates the employee details
-  const updatedData = generateUpdatedEmployeeData();
+  const updatedData = await generateUpdatedEmployeeData();
   await pimpage.updateEmployeePersonalDetails(updatedData);
 
   // Then verify the new values are entered correctly
@@ -112,6 +109,11 @@ test('update newly created employee', async ({ page, pimpage }) => {
 
   await expect(pimpage.licenseExpiryDateInput)
     .toHaveValue(updatedData.licenseExpiryDate);
+
+  await expect(pimpage.marriageStatusInput)
+    .toHaveText(updatedData.maritalStatus);
+
+
 
   // When the user saves the updated details
   await pimpage.saveUpdatedPersonalDetails();
@@ -135,8 +137,69 @@ test('update newly created employee', async ({ page, pimpage }) => {
   // And verify the updated license expiry date was saved
   await expect(pimpage.licenseExpiryDateInput)
     .toHaveValue(updatedData.licenseExpiryDate);
-console.log(updatedData.licenseExpiryDate)
 
-
+  //And verify the updated marital status was saved
+  await expect(pimpage.marriageStatusInput)
+    .toHaveText(updatedData.maritalStatus);
 
 });
+
+test('update newly created employee gender,nationality and date of birth ', async ({ page, pimpage }) => {
+
+  // Given the user is logged in and navigates to PIM
+  await pimpage.navigateToPIM();
+
+  // When the user clicks Add Employee
+  await pimpage.navigateToAddEmployee();
+
+  // And creates an employee with dynamic data
+  const { firstName, lastName } = generateEmployeeName();
+
+  await pimpage.enterEmployeeDetails(firstName, lastName);
+  await pimpage.clickSave();
+
+  // Then verify the Personal Details page is displayed
+  await expect(pimpage.personalDetailsHeading).toBeVisible({ timeout: 15000 });
+  // Wait until the original employee data is loaded
+  await expect(pimpage.lastNameInput)
+    .toHaveValue(lastName, { timeout: 15000 });
+  // When the user updates the employee additional details
+  const updatedAdditionalData = generateEmployeeAdditionalData();
+  await pimpage.updateEmployeeAdditionalDetails(updatedAdditionalData);
+
+
+  // Verify gender is selected
+  await expect(
+    pimpage.getGenderRadio(updatedAdditionalData.gender).locator('input')
+  ).toBeChecked();
+  // Verify Date of birth is filled 
+  await expect(pimpage.dateOfBirthInput)
+    .toHaveValue(updatedAdditionalData.dateOfBirth);
+    //Verify Nationality gets randomly populated
+    const selectedNationality = await pimpage.selectRandomNationality();
+
+await expect(pimpage.nationalityInput)
+    .toHaveText(selectedNationality);
+
+  // When the user saves the updated details
+  await pimpage.saveUpdatedPersonalDetails();
+
+  // Then verify the update was successful
+  await expect(
+    page.getByText('Successfully Updated')
+  ).toBeVisible();
+
+  // Reload the employee page
+  await page.reload();
+  // Verify gender is selected
+  await expect(
+    pimpage.getGenderRadio(updatedAdditionalData.gender).locator('input')
+  ).toBeChecked();
+  // Verify Date of birth is filled 
+  await expect(pimpage.dateOfBirthInput)
+    .toHaveValue(updatedAdditionalData.dateOfBirth);
+
+await expect(pimpage.nationalityInput)
+    .toHaveText(selectedNationality);
+
+})
