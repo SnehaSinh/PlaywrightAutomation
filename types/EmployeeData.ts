@@ -3,9 +3,7 @@ export type EmployeeData = {
     licenseNumber: string;
     licenseExpiryDate: string;
     maritalStatus: string;
-    nationality: string;
-    dateOfBirth: string;
-    gender: string;
+    
 };
 export type EmployeeAdditionalData = {
     nationality: string;

@@ -1,4 +1,3 @@
-import { PIMPage } from '../pages/PIMPage';
 import type { EmployeeData } from '../types/EmployeeData';
 import type { EmployeeAdditionalData } from '../types/EmployeeData';
 import type { Page } from '@playwright/test';
@@ -22,15 +21,13 @@ export function generateLicensenumber(): string {
     const randomNumber = Math.floor(10000000 + Math.random() * 90000000);
     return `DL${randomNumber}`
 };
-export function generateUpdatedEmployeeData():EmployeeData {
+export function generateUpdatedEmployeeData(): EmployeeData {
     return {
         lastName: generateRandomLastName(),
         licenseNumber: generateLicensenumber(),
         licenseExpiryDate: generateLicenseExpiryDate(),
         maritalStatus: generateMaritalStatus(),
-        nationality: '',
-        dateOfBirth: '',
-        gender: ''
+
     }
 
 
@@ -40,7 +37,7 @@ export function generateEmployeeAdditionalData(): EmployeeAdditionalData {
     return {
         nationality: '',
         gender: generateGender(),
-        dateOfBirth:generateDateOfBirth()
+        dateOfBirth: generateDateOfBirth()
     };
 }
 export function generateLicenseExpiryDate(): string {
@@ -52,7 +49,7 @@ export function generateLicenseExpiryDate(): string {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`;
+    return `${year}-${day}-${month}`;
 }
 export function generateMaritalStatus(): string {
     const statuses = ["Single", "Married", "Other"]
@@ -61,7 +58,7 @@ export function generateMaritalStatus(): string {
 }
 
 export function generateGender(): string {
-    const genders = ["Male","Female"]
+    const genders = ["Male", "Female"]
     const randomIndex = Math.floor(Math.random() * genders.length);
     return genders[randomIndex]
 }
@@ -82,7 +79,7 @@ export function generateDateOfBirth(): string {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
 
-    return `${year}-${month}-${day}`;
+    return `${year}-${day}-${month}`;
 }
 
 export async function generateRandomNationality(page: Page): Promise<string> {
@@ -94,8 +91,8 @@ export async function generateRandomNationality(page: Page): Promise<string> {
     const count = await options.count();
 
     if (count <= 1) {
-    throw new Error('No valid nationality options found');
-}
+        throw new Error('No valid nationality options found');
+    }
 
     const randomIndex = Math.floor(Math.random() * (count - 1)) + 1;
 

@@ -1,7 +1,8 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import type { EmployeeData } from '../types/EmployeeData';
 import type { EmployeeAdditionalData } from '../types/EmployeeData';
 import { generateRandomNationality } from '../helpers/employeeDataHelper';
+
 export class PIMPage {
 
     constructor(private page: Page) {
@@ -11,7 +12,20 @@ export class PIMPage {
         return this.page.getByRole('heading', { name: 'Personal Details' });
     }
 
-    get lastNameInput() {
+    get pimHeading() {
+        return this.page.getByRole('link', { name: "PIM" });
+    }
+     get dashboardHeading() {
+        return this.page.getByRole('heading', { name: "Dashboard" });
+    }
+     get employeeInformationHeading() {
+        return this.page.getByRole('heading', { name: "Employee Information" });
+    }
+     get addEmployeePageTitle() {
+        return this.page.getByRole("heading", { name: "Add Employee", exact: true });
+    }
+    
+     get lastNameInput() {
         return this.page.getByPlaceholder('Last Name');
     }
     get licenseExpiryDateInput() {
@@ -38,11 +52,25 @@ export class PIMPage {
     get updateSuccessMessage() {
         return this.page.getByText('Successfully Updated');
     }
+
     getGenderRadio(gender: string) {
         return this.page.locator(
             `//label[normalize-space()='${gender}']`
         );
     }
+    get noRecordsFoundMessage() {
+        return this.page.locator('//div[@class="orangehrm-horizontal-padding orangehrm-vertical-padding"]/span[normalize-space()="No Records Found"]');
+    }
+    get successfullyDeletedMessage() {
+        return this.page.getByText('Successfully Deleted', { exact: true });
+    }
+    get successfullyUpdatedMessage() {
+        return this.page.getByText('Successfully Updated', { exact: true });
+    }
+    get successfullySaved() {
+        return this.page.getByText('Successfully Saved', { exact: true });
+    }
+
     async navigateToPIM() {
         await this.page.getByRole('link', { name: 'PIM' }).click();
     }
@@ -99,7 +127,7 @@ export class PIMPage {
         await this.getGenderRadio(employeeData.gender).click();
 
         //Update Employee's Date of Birth
-        await this.dateOfBirthInput.fill(employeeData.dateOfBirth); 
+        await this.dateOfBirthInput.fill(employeeData.dateOfBirth);
 
     }
     async saveUpdatedPersonalDetails() {
@@ -117,5 +145,23 @@ export class PIMPage {
             .click();
 
         return nationality;
+    }
+    async verifyPersonalDetailsPageLoaded(lastName: string) {
+        await expect(this.personalDetailsHeading).toBeVisible({timeout:15000});
+        await expect(this.lastNameInput).toHaveValue(lastName);
+    }
+
+    async clickDeleteEmployee(firstName: string, lastName: string) {
+        const employeeRow = this.getEmployeeRow(firstName, lastName);
+
+        const deleteButton = employeeRow.locator('button')
+            .filter({ has: this.page.locator('i.bi-trash') });
+
+        await deleteButton.click();
+    }
+    async confirmDeleteEmployee() {
+        await this.page.getByRole('button', {
+            name: 'Yes, Delete'
+        }).click();
     }
 }
