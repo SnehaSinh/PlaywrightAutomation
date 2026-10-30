@@ -15,17 +15,26 @@ export class PIMPage {
     get pimHeading() {
         return this.page.getByRole('link', { name: "PIM" });
     }
-     get dashboardHeading() {
+    get dashboardHeading() {
         return this.page.getByRole('heading', { name: "Dashboard" });
     }
-     get employeeInformationHeading() {
+    get employeeInformationHeading() {
         return this.page.getByRole('heading', { name: "Employee Information" });
     }
-     get addEmployeePageTitle() {
+    get addEmployeePageTitle() {
         return this.page.getByRole("heading", { name: "Add Employee", exact: true });
     }
-    
-     get lastNameInput() {
+    get emptyFirstName() {
+        return this.page.locator('//input[contains(@class,"oxd-input--error orangehrm-firstname")]')
+    }
+     get emptyLastName() {
+        return this.page.locator('//input[contains(@class,"oxd-input--error orangehrm-lastname")]')
+    }
+       get firstNameInput() {
+        return this.page.getByPlaceholder('First Name');
+    }
+
+    get lastNameInput() {
         return this.page.getByPlaceholder('Last Name');
     }
     get licenseExpiryDateInput() {
@@ -69,6 +78,16 @@ export class PIMPage {
     }
     get successfullySaved() {
         return this.page.getByText('Successfully Saved', { exact: true });
+    }
+    get firstNameRequiredMessage() {
+        return this.page.locator(
+            '//input[contains(@class,"orangehrm-firstname")]/../../span[normalize-space()="Required"]'
+        );
+    }
+     get lastNameRequiredMessage() {
+        return this.page.locator(
+            '//input[contains(@class,"orangehrm-lastname")]/../../span[normalize-space()="Required"]'
+        );
     }
 
     async navigateToPIM() {
@@ -147,7 +166,7 @@ export class PIMPage {
         return nationality;
     }
     async verifyPersonalDetailsPageLoaded(lastName: string) {
-        await expect(this.personalDetailsHeading).toBeVisible({timeout:15000});
+        await expect(this.personalDetailsHeading).toBeVisible({ timeout: 15000 });
         await expect(this.lastNameInput).toHaveValue(lastName);
     }
 

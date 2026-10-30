@@ -41,7 +41,7 @@ test('add employee in pim', async ({ page, pimpage }) => {
   //And verify the save is successful
   await expect(pimpage.successfullySaved).toBeVisible();
   //Also verify that the application navigates to Employee Personal Details page
-  await expect(pimpage.personalDetailsHeading).toBeVisible({timeout:15000});
+  await expect(pimpage.personalDetailsHeading).toBeVisible({ timeout: 15000 });
 })
 
 test('search newly created employee', async ({ page, pimpage }) => {
@@ -55,7 +55,7 @@ test('search newly created employee', async ({ page, pimpage }) => {
   //Then the user saves the details
   await pimpage.clickSave();
   //And then verify that the application navigates to Employee Personal Details page
-  await expect(pimpage.personalDetailsHeading).toBeVisible({timeout:15000});
+  await expect(pimpage.personalDetailsHeading).toBeVisible({ timeout: 15000 });
   //Then navigate to PIM page to do search operation
   await pimpage.navigateToPIM();
   //And the user searches for the newly created employee
@@ -94,7 +94,7 @@ test('update newly created employee last name ,license number, license expiry da
   // Then verify the Personal Details page is displayed
   await pimpage.verifyPersonalDetailsPageLoaded(lastName)
   // When the user updates the employee details
-  const updatedData =  generateUpdatedEmployeeData();
+  const updatedData = generateUpdatedEmployeeData();
   await pimpage.updateEmployeePersonalDetails(updatedData);
 
   // Then verify the new values are entered correctly
@@ -233,10 +233,8 @@ test('delete newly created employee', async ({ page, pimpage }) => {
   //And navigates back to PIM page to search for deleted employee
   await pimpage.navigateToPIM();
   await pimpage.searchEmployeeByName(`${firstName}`)
-//And then the user clicks on the Search button
+  //And then the user clicks on the Search button
   await pimpage.clickSearch();
- //Then verify that no record is found 
- await expect (pimpage.noRecordsFoundMessage).toBeVisible();
-   const url=page.url;
-  console.log(url);
+  //Then verify that no record is found 
+  await expect(pimpage.noRecordsFoundMessage).toBeVisible();
 })
