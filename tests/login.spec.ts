@@ -62,8 +62,8 @@ await loginpage.navigateToLoginPage();
 //Then the user keeps the username and password blank
 await loginpage.loginToApplication("","");
 //Then verify two "Required" validation messages should be displayed, one for Username and one for Password
-const numberOfRequired=await page.locator('//input[contains(@class,"oxd-input--error") ]/parent::div/following-sibling::span[text()="Required"]').count();
- expect(numberOfRequired).toBe(2);
+await expect (page.locator('//input[contains(@class,"oxd-input--error") ]/parent::div/following-sibling::span[text()="Required"]')).toHaveCount(2);
+ 
 //And alsoverify that the user stays in the login page whose heading is Login
 await expect(page.getByRole('heading',{name:"Login"})).toBeVisible();
 }); 
