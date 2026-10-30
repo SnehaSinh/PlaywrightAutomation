@@ -25,10 +25,10 @@ export class PIMPage {
         return this.page.getByRole("heading", { name: "Add Employee", exact: true });
     }
     get emptyFirstName() {
-        return this.page.locator('//input[contains(@class,"oxd-input--error orangehrm-firstname")]')
+        return this.page.locator('//input[contains(@class,"oxd-input--error") and contains(@class,"orangehrm-firstname")]')
     }
      get emptyLastName() {
-        return this.page.locator('//input[contains(@class,"oxd-input--error orangehrm-lastname")]')
+        return this.page.locator('//input[contains(@class,"oxd-input--error") and contains(@class,"orangehrm-lastname")]')
     }
        get firstNameInput() {
         return this.page.getByPlaceholder('First Name');
@@ -117,8 +117,8 @@ export class PIMPage {
         await this.page.getByRole("button", { name: "Add" }).click();
     }
     async enterEmployeeDetails(firstName: string, lastName: string) {
-        await this.page.getByPlaceholder("First Name").fill(firstName);
-        await this.page.getByPlaceholder("Last Name").fill(lastName);
+        await this.firstNameInput.fill(firstName);
+        await this.lastNameInput.fill(lastName);
 
     }
     async clickSave() {
